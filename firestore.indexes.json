@@ -1,0 +1,46 @@
+{
+  "indexes": [
+    { "collectionGroup": "checkpoints", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "qrToken", "order": "ASCENDING" },
+      { "fieldPath": "active", "order": "ASCENDING" } ] },
+    { "collectionGroup": "tasks", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "dueAt", "order": "ASCENDING" } ] },
+    { "collectionGroup": "tasks", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "graceUntil", "order": "ASCENDING" } ] },
+    { "collectionGroup": "tasks", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "checkpointId", "order": "ASCENDING" },
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "dueAt", "order": "ASCENDING" } ] },
+    { "collectionGroup": "tasks", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "assignedRole", "order": "ASCENDING" },
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "dueAt", "order": "ASCENDING" } ] },
+    { "collectionGroup": "evidence", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "checkpointId", "order": "ASCENDING" },
+      { "fieldPath": "finalizedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "evidence", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "registerId", "order": "ASCENDING" },
+      { "fieldPath": "finalizedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "members", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "active", "order": "ASCENDING" },
+      { "fieldPath": "roles", "arrayConfig": "CONTAINS" } ] },
+    { "collectionGroup": "trainingRecords", "queryScope": "COLLECTION_GROUP", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "expiresAt", "order": "ASCENDING" } ] },
+    { "collectionGroup": "trainingRecords", "queryScope": "COLLECTION_GROUP", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "dueAt", "order": "ASCENDING" } ] },
+    { "collectionGroup": "enrollments", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "staffUid", "order": "ASCENDING" },
+      { "fieldPath": "status", "order": "ASCENDING" } ] },
+    { "collectionGroup": "certificates", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "staffId", "order": "ASCENDING" },
+      { "fieldPath": "issuedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "courses", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "origin", "order": "ASCENDING" },
+      { "fieldPath": "status", "order": "ASCENDING" } ] }
+  ],
+  "fieldOverrides": []
+}
