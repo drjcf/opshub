@@ -13,11 +13,18 @@ export {
 } from './src/callables.js';
 
 export { registerCheckSubmit, expirationSweep } from './src/registers.js';
+export {
+  onPersonnelCreated,
+  onPersonnelUpdated,
+  trainingSweep,
+  trainingAttest,
+  trainingApproveExternal,
+  trainingMatrix,
+} from './src/training.js';
 export { materializeTasks } from './src/scheduler.js';
 export { onNotificationCreated, morningDigest } from './src/notifier.js';
 
 // Pending per BUILD-MANIFEST.md:
-//   training.js  — personnel triggers, trainingSweep, attest/approveExternal
 //   lms.js       — course.publish, quiz.submit, lesson views, completion tx,
 //                  certificates, /verify public endpoint
 //   catalog.js   — importPackage, exportPackage, catalogSync
