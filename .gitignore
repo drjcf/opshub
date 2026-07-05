@@ -14,3 +14,4 @@ app/.env.local
 # secrets
 serviceaccount.json
 seed/bootstrap/node_modules/
+.poo
