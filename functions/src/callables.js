@@ -75,16 +75,24 @@ export const scanResolve = onCall(async (req) => {
   const cp = { id: cps.docs[0].id, ...cps.docs[0].data() };
 
   const now = Timestamp.now();
-  const tasksSnap = await db
-    .collection(`orgs/${orgId}/tasks`)
-    .where('checkpointId', '==', cp.id)
-    .where('status', '==', 'open')
-    .where('dueAt', '<=', Timestamp.fromMillis(now.toMillis() + 36 * 3600 * 1000))
-    .orderBy('dueAt')
-    .limit(10)
-    .get();
+  const horizon = Timestamp.fromMillis(now.toMillis() + 36 * 3600 * 1000);
 
-  const tasks = tasksSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  // Open tasks due within the look-ahead window, PLUS missed tasks (overdue,
+  // past grace). A late crash-cart check must stay scannable — "the check is
+  // overdue" is exactly when a staffer needs to complete it. `missed` is a
+  // status the submit path already accepts; it stays flagged as late in the
+  // evidence trail rather than being silently rewritten to on-time.
+  const base = db.collection(`orgs/${orgId}/tasks`).where('checkpointId', '==', cp.id);
+  const [openSnap, missedSnap] = await Promise.all([
+    base.where('status', '==', 'open').where('dueAt', '<=', horizon).orderBy('dueAt').limit(10).get(),
+    base.where('status', '==', 'missed').orderBy('dueAt', 'desc').limit(10).get(),
+  ]);
+
+  // Missed first (most urgent), then upcoming open, de-duplicated by id.
+  const byId = new Map();
+  for (const d of missedSnap.docs) byId.set(d.id, { id: d.id, late: true, ...d.data() });
+  for (const d of openSnap.docs) if (!byId.has(d.id)) byId.set(d.id, { id: d.id, late: false, ...d.data() });
+  const tasks = [...byId.values()];
 
   const templateIds = new Set(tasks.map((t) => t.checklistTemplateId).filter(Boolean));
   if (cp.allowAdhocLog && cp.adhocTemplateId) templateIds.add(cp.adhocTemplateId);

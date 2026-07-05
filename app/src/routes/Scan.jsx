@@ -106,6 +106,7 @@ export default function Scan() {
 
   return (
     <ScanShell title={checkpoint.label} subtitle={checkpoint.location}>
+      {task.late && <div className="late-banner">This check is overdue — logging it now records it as late.</div>}
       {task.registerId ? (
         <RegisterCheckForm
           orgId={routeOrg} token={token} task={task}

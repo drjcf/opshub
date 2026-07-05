@@ -201,3 +201,6 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .verdict-row { margin-top: 10px; }
 .replace-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
 .range-hint { display: block; font-size: 12px; color: var(--idle); font-weight: 400; margin-top: 4px; }
+
+.late-banner { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn);
+  border-radius: 8px; padding: 10px 13px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
