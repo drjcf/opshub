@@ -53,18 +53,32 @@ your custom claim's `orgId`. Mismatch = "wrong organization" / empty data.
    crash cart QR. Expect epinephrine flagged red, forcing a verdict.
 
 ## Redeploys
-- Existing functions: `firebase deploy --only functions` — IAM persists, no re-grant.
-- NEW callable added: re-run `./seed/tools/grant-invokers.sh` after deploy.
+- Existing functions (all): `firebase deploy --only functions` — IAM persists, no re-grant.
+- ONE function: `firebase deploy --only functions:opshub:<name>` — note the
+  `opshub:` codebase qualifier. `firebase.json` names the codebase "opshub",
+  so bare `functions:<name>` aborts with "No function matches given --only
+  filters." Always include the codebase name for targeted function deploys.
+- Indexes: `firebase deploy --only firestore:indexes`. Deploy indexes BEFORE
+  the function that queries them, so a scan in the gap doesn't 500 on a
+  missing index. Watch build state → READY:
+      gcloud firestore indexes composite list --project edai-opshub \
+        --format="table(name,state)"
 - App change: `cd app && npm run build && cd .. && firebase deploy --only hosting`.
+- Combined targeted deploys can silently skip halves if one filter fails —
+  prefer separate commands (indexes, then function) over one --only with both.
 
 ## Debugging a function 500
     gcloud run services logs read <servicename-lowercase> \
       --project edai-opshub --region us-central1 --limit 30
 Service names are LOWERCASE (scanResolve → scanresolve).
+Request logs show the 500; APP logs (above) show the exception + stack.
 
 ## Common failures & fixes
 - CORS / preflight blocked → invoker not granted → grant-invokers.sh
 - 500 PERMISSION_DENIED (Firestore) → runtime SA missing datastore.user → iam-setup.sh
 - Build failed, missing build SA permission → iam-setup.sh (build roles)
+- "No function matches --only filters" → add codebase: functions:opshub:<name>
+- 500 FAILED_PRECONDITION + "create composite index" URL → index still
+  building; wait for READY, or the query needs a new index in indexes.json
 - "wrong organization" / empty → VITE_ORG_ID ≠ ORG_ID ≠ claim orgId
 - QR 404 → hosting site not created/targeted, or VITE_APP_HOST wrong

@@ -7,6 +7,7 @@ import Checkpoints from './routes/Checkpoints.jsx';
 import Registers from './routes/Registers.jsx';
 import Labels from './routes/Labels.jsx';
 import Today from './routes/Today.jsx';
+import Members from './routes/Members.jsx';
 
 function Login() {
   const { login } = useAuth();
@@ -48,6 +49,7 @@ function Sidebar() {
       <NavLink to="/checkpoints" className="navlink">Checkpoints</NavLink>
       <NavLink to="/registers" className="navlink">Registers</NavLink>
       <NavLink to="/labels" className="navlink">Print labels</NavLink>
+      <NavLink to="/people" className="navlink">People</NavLink>
       <div className="nav-sep" />
       <NavLink to="/today" className="navlink">Today</NavLink>
       <div className="navlink" style={{ opacity: 0.5, cursor: 'default' }}>Training · soon</div>
@@ -77,6 +79,7 @@ export default function App() {
           <Route path="/checkpoints" element={<Checkpoints />} />
           <Route path="/registers" element={<Registers />} />
           <Route path="/labels" element={<Labels />} />
+          <Route path="/people" element={<Members />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
       </main>

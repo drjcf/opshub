@@ -13,6 +13,7 @@ export {
 } from './src/callables.js';
 
 export { registerCheckSubmit, expirationSweep } from './src/registers.js';
+export { memberCreate, memberSetRoles, memberDeactivate } from './src/members.js';
 export {
   onPersonnelCreated,
   onPersonnelUpdated,
