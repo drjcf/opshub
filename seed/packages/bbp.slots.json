@@ -1,0 +1,4 @@
+[
+  { "lessonId": "l5", "title": "Facility Exposure Control Plan", "type": "attestation",
+    "bindTo": { "documentCategory": "plan", "suggestedTitle": "Exposure Control Plan" }, "required": true }
+]

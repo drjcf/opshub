@@ -3,3 +3,5 @@ node_modules/
 firebase-debug.log
 firestore-debug.log
 .firebase/
+*.tar.gz
+seed/keys/*-private.pem

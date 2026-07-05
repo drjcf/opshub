@@ -29,7 +29,12 @@ export {
   quizSubmit,
   verifyCertificate,
 } from './src/lms.js';
+export {
+  catalogImportPackage,
+  catalogExportPackage,
+  catalogSync,
+} from './src/catalog.js';
 export { onNotificationCreated, morningDigest } from './src/notifier.js';
 
 // Pending per BUILD-MANIFEST.md:
-//   catalog.js   — importPackage, exportPackage, catalogSync
+//   (backend complete — remaining work is the React+Vite PWA, Sessions E/F)

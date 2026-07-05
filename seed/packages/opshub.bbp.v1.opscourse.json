@@ -1,0 +1,161 @@
+{
+  "format": "opscourse/1",
+  "catalogId": "opshub.bbp",
+  "catalogVersion": 1,
+  "minAppVersion": "0.2.0",
+  "course": {
+    "meta": {
+      "title": "Bloodborne Pathogens (OSHA 1910.1030)",
+      "description": "Annual bloodborne pathogens training covering exposure risks, universal precautions, PPE, and post-exposure procedures. Includes a facility-specific Exposure Control Plan attestation.",
+      "category": "safety",
+      "passingScore": 80,
+      "standardRefs": []
+    },
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Understanding the Risk",
+        "order": 1
+      },
+      {
+        "id": "s2",
+        "title": "Prevention & PPE",
+        "order": 2
+      },
+      {
+        "id": "s3",
+        "title": "Exposure Response",
+        "order": 3
+      },
+      {
+        "id": "s4",
+        "title": "Facility Plan",
+        "order": 4
+      }
+    ],
+    "lessons": [
+      {
+        "id": "l1",
+        "sectionId": "s1",
+        "order": 1,
+        "type": "reading",
+        "required": true,
+        "title": "What are bloodborne pathogens?",
+        "content": {
+          "markdown": "Bloodborne pathogens are infectious microorganisms in human blood that can cause disease, including hepatitis B (HBV), hepatitis C (HCV), and HIV. In a surgical and procedural setting, potential exposure occurs through needlesticks, sharps injuries, and contact between infectious material and mucous membranes or non-intact skin.\n\nThis training satisfies the annual retraining requirement of the OSHA Bloodborne Pathogens Standard. It must be supplemented by your facility's own written Exposure Control Plan, which is presented for attestation at the end of this course."
+        }
+      },
+      {
+        "id": "l2",
+        "sectionId": "s2",
+        "order": 2,
+        "type": "reading",
+        "required": true,
+        "title": "Universal precautions & engineering controls",
+        "content": {
+          "markdown": "Treat all human blood and specified body fluids as if infectious — this is the principle of universal precautions. Engineering controls (sharps containers, safer sharps devices, biosafety practices) are the first line of defense; work-practice controls and PPE follow.\n\nKey practices: never recap needles by hand, activate safety mechanisms on sharps immediately after use, dispose of sharps at point of use, and use appropriate PPE for anticipated exposure."
+        }
+      },
+      {
+        "id": "l3",
+        "sectionId": "s2",
+        "order": 3,
+        "type": "quiz",
+        "required": true,
+        "title": "Prevention knowledge check",
+        "content": {
+          "questionCount": 3,
+          "passingScore": 80,
+          "shuffle": true,
+          "allowRetake": true,
+          "maxAttempts": 3,
+          "questions": [
+            {
+              "qid": "q1",
+              "stem": "Which principle directs you to treat all blood as potentially infectious?",
+              "options": [
+                "Selective screening",
+                "Universal precautions",
+                "Risk stratification",
+                "Post-exposure prophylaxis"
+              ]
+            },
+            {
+              "qid": "q2",
+              "stem": "What is the correct action immediately after using a safety-engineered needle?",
+              "options": [
+                "Recap it by hand for reuse",
+                "Activate the safety mechanism and dispose at point of use",
+                "Leave it on the tray for the next case",
+                "Rinse and return to supply"
+              ]
+            },
+            {
+              "qid": "q3",
+              "stem": "Engineering controls are best described as:",
+              "options": [
+                "Written policies staff must memorize",
+                "Devices and systems that isolate or remove the hazard",
+                "Annual training sessions",
+                "Personal protective equipment only"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "l4",
+        "sectionId": "s3",
+        "order": 4,
+        "type": "reading",
+        "required": true,
+        "title": "If an exposure occurs",
+        "content": {
+          "markdown": "After a percutaneous or mucous-membrane exposure: wash the area with soap and water (flush mucous membranes with water or saline), report immediately to your supervisor, and seek evaluation. Timely post-exposure prophylaxis can be critical. Your facility's Exposure Control Plan specifies the exact reporting chain and medical follow-up available to you — review it in the final lesson."
+        }
+      },
+      {
+        "id": "l5",
+        "sectionId": "s4",
+        "order": 5,
+        "type": "attestation",
+        "required": true,
+        "title": "Facility Exposure Control Plan",
+        "content": {
+          "documentId": null
+        }
+      }
+    ],
+    "answerKeys": {
+      "l3": {
+        "q1": {
+          "correctIndex": 1,
+          "rationale": "Universal precautions: treat all blood and specified body fluids as infectious."
+        },
+        "q2": {
+          "correctIndex": 1,
+          "rationale": "Activate the safety mechanism immediately and dispose at point of use; never recap by hand."
+        },
+        "q3": {
+          "correctIndex": 1,
+          "rationale": "Engineering controls isolate or remove the hazard (e.g., sharps containers, safer devices)."
+        }
+      }
+    }
+  },
+  "siteSpecificSlots": [
+    {
+      "lessonId": "l5",
+      "title": "Facility Exposure Control Plan",
+      "type": "attestation",
+      "bindTo": {
+        "documentCategory": "plan",
+        "suggestedTitle": "Exposure Control Plan"
+      },
+      "required": true
+    }
+  ],
+  "contentHash": "f0046d6c014093fa6ec8049a6cd5fb0f4df1243ef4f1cc91114e488f188652c8",
+  "publisher": "EdAI Systems",
+  "signature": "THo79xDfG6J0DXasIfhiTAIL0EtcmOopKQ0LiPXwufnDTQlR7tTzCCgmk3DcDsQ1AXzAMp35eGxtCxE9uVUrBg=="
+}
