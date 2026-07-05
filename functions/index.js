@@ -15,6 +15,19 @@ export {
 export { registerCheckSubmit, expirationSweep } from './src/registers.js';
 export { memberCreate, memberSetRoles, memberDeactivate } from './src/members.js';
 export {
+  handbookAttestLicense,
+  handbookSetEntry,
+  handbookRemoveEdition,
+  handbookGetCrosswalk,
+  handbookIngestFromUpload,
+  handbookConfirmDrafts,
+} from './src/handbook.js';
+export {
+  llmDraftShortRefs,
+  llmConfirmShortRefs,
+  llmAsk,
+} from './src/llm-assist.js';
+export {
   onPersonnelCreated,
   onPersonnelUpdated,
   trainingSweep,

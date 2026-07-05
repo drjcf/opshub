@@ -261,6 +261,20 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // ===== Delta 06: licensee handbook (per-tenant, NOT surveyor-readable) =====
+      match /handbookConfig/{cfg} {
+        allow read: if isStaff(orgId);
+        allow write: if false;                 // attestLicense callable only
+      }
+      match /handbookEntries/{standardId} {
+        allow read: if isStaff(orgId);         // surveyors bring their own copy
+        allow write: if false;                 // setEntry/ingest callables only
+      }
+      match /handbookEntriesDraft/{draftId} {
+        allow read: if isStaff(orgId);         // review page reads staged parser output
+        allow write: if false;                 // ingest/confirm callables only
+      }
+
       // -- audit log: read by admins and surveyors; written by Admin SDK only
       match /auditLog/{entryId} {
         allow read: if isAdmin(orgId) || isActiveSurveyor(orgId);
