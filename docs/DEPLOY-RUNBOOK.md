@@ -76,6 +76,7 @@ Request logs show the 500; APP logs (above) show the exception + stack.
 ## Common failures & fixes
 - CORS / preflight blocked → invoker not granted → grant-invokers.sh
 - 500 PERMISSION_DENIED (Firestore) → runtime SA missing datastore.user → iam-setup.sh
+- 500 auth/insufficient-permission (member/surveyor callables) → runtime SA missing firebaseauth.admin → iam-setup.sh
 - Build failed, missing build SA permission → iam-setup.sh (build roles)
 - "No function matches --only filters" → add codebase: functions:opshub:<name>
 - 500 FAILED_PRECONDITION + "create composite index" URL → index still

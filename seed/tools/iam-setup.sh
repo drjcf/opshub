@@ -25,6 +25,8 @@ echo
 # --- roles the RUNTIME service account needs to execute functions ---
 RUNTIME_ROLES=(
   roles/datastore.user                 # Firestore read/write (Admin SDK)
+  roles/firebaseauth.admin             # setCustomUserClaims / manage Auth users
+                                       #   (member + surveyor callables need this)
   roles/secretmanager.secretAccessor   # read PUBLISHER_PRIVATE_KEY, RESEND_API_KEY
   roles/iam.serviceAccountTokenCreator # setCustomUserClaims (surveyorGrant/Revoke)
   roles/eventarc.eventReceiver         # Firestore-trigger functions
