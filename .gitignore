@@ -16,3 +16,5 @@ serviceaccount.json
 seed/bootstrap/node_modules/
 .poo
 .poo
+.poo
+functions/.env*
