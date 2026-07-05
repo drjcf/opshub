@@ -6,6 +6,7 @@ import { Loader } from './components/ui.jsx';
 import Checkpoints from './routes/Checkpoints.jsx';
 import Registers from './routes/Registers.jsx';
 import Labels from './routes/Labels.jsx';
+import Today from './routes/Today.jsx';
 
 function Login() {
   const { login } = useAuth();
@@ -48,7 +49,7 @@ function Sidebar() {
       <NavLink to="/registers" className="navlink">Registers</NavLink>
       <NavLink to="/labels" className="navlink">Print labels</NavLink>
       <div className="nav-sep" />
-      <div className="navlink" style={{ opacity: 0.5, cursor: 'default' }}>Today · soon</div>
+      <NavLink to="/today" className="navlink">Today</NavLink>
       <div className="navlink" style={{ opacity: 0.5, cursor: 'default' }}>Training · soon</div>
       <div className="sidebar-foot">
         {user?.email}<br />{roles.join(', ') || 'no role'} · {orgId || '—'}
@@ -72,10 +73,11 @@ export default function App() {
             You're signed in but read-only here.</div>
         )}
         <Routes>
+          <Route path="/today" element={<Today />} />
           <Route path="/checkpoints" element={<Checkpoints />} />
           <Route path="/registers" element={<Registers />} />
           <Route path="/labels" element={<Labels />} />
-          <Route path="*" element={<Navigate to="/checkpoints" replace />} />
+          <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
       </main>
     </div>

@@ -169,3 +169,35 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
   .main { padding: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ---- scan flow (full-screen, mobile-first) ---- */
+.scan-wrap { min-height: 100vh; min-height: 100dvh; background: var(--paper); display: flex; justify-content: center; padding: 0; }
+.scan-inner { width: 100%; max-width: 480px; padding: 28px 20px 48px; }
+.scan-brand { color: var(--ink); font-weight: 700; font-size: 18px; margin-bottom: 24px; }
+.scan-brand span { color: var(--ok); }
+.scan-title { color: var(--ink); font-size: 24px; font-weight: 680; margin: 0; letter-spacing: -0.02em; }
+.scan-sub { color: var(--idle); font-size: 14px; margin: 2px 0 20px; }
+.scan-lead { color: var(--slate); font-size: 15px; margin: 0 0 18px; }
+.scan-card { margin-top: 12px; }
+.scan-btn { width: 100%; justify-content: center; padding: 14px; font-size: 16px; margin-top: 8px; }
+.scan-done { text-align: center; padding: 30px 0; }
+.scan-check { width: 64px; height: 64px; border-radius: 50%; background: var(--ok-bg); color: var(--ok);
+  font-size: 34px; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+
+.check-form { margin-top: 8px; }
+.item-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+.item { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: #fff; }
+.item-flag-expired { border-color: var(--alert); background: var(--alert-bg); }
+.item-flag-expiring { border-color: var(--warn); background: var(--warn-bg); }
+.item-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.item-name { font-weight: 600; color: var(--ink); font-size: 15px; }
+.item-name .req { color: var(--idle); font-weight: 400; font-size: 12px; }
+.item-meta { font-size: 12px; color: var(--slate); margin-top: 2px; }
+.item-ok { color: var(--ok); font-size: 13px; font-weight: 600; margin-top: 6px; }
+.tag { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; margin-left: 8px; }
+.tag-alert { background: var(--alert); color: #fff; }
+.tag-warn { background: var(--warn); color: #fff; }
+.verdict-row { margin-top: 10px; }
+.replace-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.range-hint { display: block; font-size: 12px; color: var(--idle); font-weight: 400; margin-top: 4px; }
