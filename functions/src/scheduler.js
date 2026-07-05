@@ -4,8 +4,10 @@
 // Also flips open tasks past graceUntil to 'missed' (one-way; see policy).
 
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { RRule } from 'rrule';
+import pkg from 'rrule';
 import { db, FieldValue, Timestamp, sha256, auditDirect } from './util.js';
+
+const { RRule } = pkg; // rrule is CommonJS — default import then destructure.
 
 const HORIZON_MS = 48 * 3600 * 1000;
 
