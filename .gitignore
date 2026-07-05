@@ -5,3 +5,8 @@ firestore-debug.log
 .firebase/
 *.tar.gz
 seed/keys/*-private.pem
+
+# app
+app/node_modules/
+app/dist/
+app/.env.local
