@@ -22,9 +22,14 @@ export {
   trainingMatrix,
 } from './src/training.js';
 export { materializeTasks } from './src/scheduler.js';
+export {
+  coursePublish,
+  enrollmentLessonView,
+  lessonMarkComplete,
+  quizSubmit,
+  verifyCertificate,
+} from './src/lms.js';
 export { onNotificationCreated, morningDigest } from './src/notifier.js';
 
 // Pending per BUILD-MANIFEST.md:
-//   lms.js       — course.publish, quiz.submit, lesson views, completion tx,
-//                  certificates, /verify public endpoint
 //   catalog.js   — importPackage, exportPackage, catalogSync
