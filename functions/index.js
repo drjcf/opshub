@@ -21,12 +21,28 @@ export {
   handbookGetCrosswalk,
   handbookIngestFromUpload,
   handbookConfirmDrafts,
+  handbookSeedTreeFromDrafts,
 } from './src/handbook.js';
 export {
   llmDraftShortRefs,
   llmConfirmShortRefs,
   llmAsk,
 } from './src/llm-assist.js';
+export {
+  assessmentCreate,
+  assessmentRateItem,
+  assessmentOverrideStandard,
+  assessmentSetApplicability,
+  assessmentComplete,
+} from './src/assessment.js';
+export {
+  libraryCreateFolder,
+  libraryRenameFolder,
+  libraryRegisterFile,
+  libraryMoveFile,
+  libraryArchiveFile,
+  librarySearch,
+} from './src/library.js';
 export {
   onPersonnelCreated,
   onPersonnelUpdated,

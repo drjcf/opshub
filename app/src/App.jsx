@@ -10,6 +10,8 @@ import Today from './routes/Today.jsx';
 import Members from './routes/Members.jsx';
 import Standards from './routes/Standards.jsx';
 import HandbookDrafts from './routes/HandbookDrafts.jsx';
+import Assessments from './routes/Assessments.jsx';
+import Library from './routes/Library.jsx';
 
 function Login() {
   const { login } = useAuth();
@@ -54,6 +56,8 @@ function Sidebar() {
       <NavLink to="/people" className="navlink">People</NavLink>
       <NavLink to="/standards" className="navlink">Standards</NavLink>
       <NavLink to="/handbook-drafts" className="navlink">Review entries</NavLink>
+      <NavLink to="/assessments" className="navlink">Self-Assessment</NavLink>
+      <NavLink to="/library" className="navlink">Library</NavLink>
       <div className="nav-sep" />
       <NavLink to="/today" className="navlink">Today</NavLink>
       <div className="navlink" style={{ opacity: 0.5, cursor: 'default' }}>Training · soon</div>
@@ -86,6 +90,8 @@ export default function App() {
           <Route path="/people" element={<Members />} />
           <Route path="/standards" element={<Standards />} />
           <Route path="/handbook-drafts" element={<HandbookDrafts />} />
+          <Route path="/assessments" element={<Assessments />} />
+          <Route path="/library" element={<Library />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
       </main>

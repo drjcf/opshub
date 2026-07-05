@@ -275,6 +275,26 @@ service cloud.firestore {
         allow write: if false;                 // ingest/confirm callables only
       }
 
+      // ===== Delta 09: document library (archive + folders) =====
+      match /libraryFiles/{fileId} {
+        allow read: if canRead(orgId);
+        allow write: if false;                // callables only
+      }
+      match /folders/{folderId} {
+        allow read: if canRead(orgId);
+        allow write: if false;                // callables only
+      }
+
+      // ===== Delta 08: self-assessment scoring =====
+      match /assessments/{aid} {
+        allow read: if canRead(orgId);        // surveyors may see readiness
+        allow write: if false;                // callables only
+        match /ratings/{code} {
+          allow read: if canRead(orgId);
+          allow write: if false;              // rateItem/override callables only
+        }
+      }
+
       // -- audit log: read by admins and surveyors; written by Admin SDK only
       match /auditLog/{entryId} {
         allow read: if isAdmin(orgId) || isActiveSurveyor(orgId);

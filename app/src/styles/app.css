@@ -236,3 +236,20 @@ textarea { resize: vertical; font-family: var(--font); }
 .ask-text { color: var(--ink); font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
 .ask-cites { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
 .ask-disclaimer { margin-top: 12px; font-size: 12px; }
+
+/* ---- self-assessment ---- */
+.readiness { display: flex; gap: 28px; align-items: center; }
+.readiness-overall { text-align: center; padding-right: 24px; border-right: 1px solid var(--line); }
+.readiness-counts { display: flex; gap: 22px; flex: 1; }
+.count-cell { text-align: center; }
+.count-n { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.domain-bars { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 7px; }
+.domain-bar { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.bar-track { flex: 1; height: 8px; background: #eef1f0; border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width .3s; }
+.rating-opts { display: flex; gap: 6px; flex-wrap: wrap; }
+.rating-opt { padding: 6px 14px; border: 1px solid var(--line); background: #fff; border-radius: 7px;
+  font-size: 13px; font-weight: 600; color: var(--slate); cursor: pointer; }
+.rating-opt:hover:not(:disabled) { border-color: var(--accent); }
+.rating-opt.sel { background: var(--accent); color: #fff; border-color: var(--accent); }
+.rating-opt:disabled { opacity: 0.6; cursor: default; }
