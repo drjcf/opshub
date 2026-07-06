@@ -58,6 +58,10 @@ export {
   qiUpdateAction, qiAddAnalysis, qiAdvanceStatus, qiCloseStudy,
 } from './src/qi.js';
 export {
+  committeeCreate, committeeUpdate, meetingTemplateSave, meetingTemplateRetire,
+  meetingCreate, meetingSaveSection, meetingSetAttendance, meetingFinalizeMinutes,
+} from './src/committees.js';
+export {
   onPersonnelCreated,
   onPersonnelUpdated,
   trainingSweep,

@@ -182,17 +182,18 @@ service cloud.firestore {
         }
       }
 
-      // -- committees & meetings
+      // -- committees & meetings (Delta 12): callable-only
       match /committees/{committeeId} {
         allow read: if canRead(orgId);
-        allow create, update: if isAdmin(orgId);
-        allow delete: if false;
+        allow write: if false;
         match /meetings/{meetingId} {
           allow read: if canRead(orgId);
-          allow create, update: if isAdmin(orgId)
-            && untouched(['minutesEvidenceId']); // minutes link set by callable
-          allow delete: if false;
+          allow write: if false;
         }
+      }
+      match /meetingTemplates/{templateId} {
+        allow read: if canRead(orgId);
+        allow write: if false;
       }
 
       // -- assets
