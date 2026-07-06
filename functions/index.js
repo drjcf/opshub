@@ -62,6 +62,10 @@ export {
   meetingCreate, meetingSaveSection, meetingSetAttendance, meetingFinalizeMinutes,
 } from './src/committees.js';
 export {
+  incidentReport, incidentSetInvestigation, incidentAddAction, incidentUpdateAction,
+  incidentAdvanceStatus, incidentClose, incidentFeedToQI,
+} from './src/incidents.js';
+export {
   onPersonnelCreated,
   onPersonnelUpdated,
   trainingSweep,

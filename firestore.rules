@@ -206,10 +206,11 @@ service cloud.firestore {
       // -- incidents: staff read/write; surveyors read (de-identified by schema)
       match /incidents/{incidentId} {
         allow read: if canRead(orgId);
-        allow create: if isStaff(orgId);
-        allow update: if (isAdmin(orgId) || hasRole(orgId, 'clinicalDirector'))
-          && resource.data.status != 'closed';   // closed incidents immutable
-        allow delete: if false;
+        allow write: if false;                    // incident callables only
+        match /actions/{actionId} {
+          allow read: if canRead(orgId);
+          allow write: if false;
+        }
       }
 
 

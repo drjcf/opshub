@@ -15,6 +15,7 @@ import Library from './routes/Library.jsx';
 import LogsHub from './routes/LogsHub.jsx';
 import QIStudies from './routes/QIStudies.jsx';
 import Committees from './routes/Committees.jsx';
+import Incidents from './routes/Incidents.jsx';
 
 function Login() {
   const { login } = useAuth();
@@ -58,6 +59,7 @@ function Sidebar() {
       <NavLink to="/logs" className="navlink">Logs & Checklists</NavLink>
       <NavLink to="/qi" className="navlink">QA / QI</NavLink>
       <NavLink to="/committees" className="navlink">Committees</NavLink>
+      <NavLink to="/incidents" className="navlink">Incidents</NavLink>
       <NavLink to="/labels" className="navlink">Print labels</NavLink>
       <NavLink to="/people" className="navlink">People</NavLink>
       <NavLink to="/standards" className="navlink">Standards</NavLink>
@@ -101,6 +103,7 @@ export default function App() {
           <Route path="/logs" element={<LogsHub />} />
           <Route path="/qi" element={<QIStudies />} />
           <Route path="/committees" element={<Committees />} />
+          <Route path="/incidents" element={<Incidents />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
       </main>
