@@ -51,6 +51,8 @@ export {
   hrDocArchive,
   employeeFileGet,
 } from './src/personnel-file.js';
+export { logsHubRoster, logsHubHistory } from './src/logs-hub.js';
+export { logTemplateCreate, logTemplateUpdate, logTemplateRetire } from './src/log-templates.js';
 export {
   onPersonnelCreated,
   onPersonnelUpdated,

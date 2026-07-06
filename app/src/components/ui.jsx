@@ -4,10 +4,10 @@ export function StatusPill({ kind, children }) {
   return <span className={`pill ${cls}`}><span className={`dot ${cls}`} />{children}</span>;
 }
 
-export function Modal({ title, onClose, children, footer }) {
+export function Modal({ title, onClose, children, footer, wide }) {
   return (
     <div className="modal-back" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className={`modal ${wide ? 'modal-wide' : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <h2>{title}</h2>
           <button className="x" onClick={onClose} aria-label="Close">×</button>

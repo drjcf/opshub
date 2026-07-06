@@ -148,6 +148,7 @@ async function submitScanEvidence({ orgId, auth, checkpoint, template, templateI
       title: task ? task.title : `${template.title} — ${checkpoint.label}`,
       standardRefs: task?.standardRefs ?? template.standardRefs ?? [],
       taskId: taskId ?? null,
+      obligationId: task?.obligationId ?? null,   // link completion → obligation (logs hub)
       payload: {
         templateId,
         templateVersionHash: sha256(JSON.stringify(template.fields)),
