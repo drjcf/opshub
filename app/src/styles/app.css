@@ -294,3 +294,11 @@ textarea { resize: vertical; font-family: var(--font); }
 .stage:hover { border-color: var(--accent); }
 .stage.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 @media (max-width: 720px) { .qi-measure { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---- infection control ---- */
+.ic-status { display: flex; gap: 12px; flex-wrap: wrap; }
+.ic-chip { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; flex: 1; min-width: 200px; }
+.ic-chip.ok { background: var(--ok-bg); color: var(--ok); }
+.ic-chip.bad { background: var(--alert-bg, #fef2f2); color: var(--alert, #dc2626); }
+.ic-dot { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; background: rgba(255,255,255,0.6); }
+@media (max-width: 720px) { .ic-status { flex-direction: column; } }
