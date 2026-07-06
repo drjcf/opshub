@@ -28,18 +28,37 @@ export const llmDraftShortRefs = onCall(withSecrets, async (req) => {
   }
   const edition = lic.get('edition');
 
-  // Pull entered handbook text for standards needing shortRefs.
+  // Pull ALL entered handbook text for this edition (standards + elements).
+  // v44 puts most requirement text on elements, so build each standard's
+  // context from its own text PLUS its elements' text.
   const entries = await db.collection(`orgs/${orgId}/handbookEntries`)
-    .where('edition', '==', edition).where('kind', '==', 'standard').limit(60).get();
+    .where('edition', '==', edition).limit(1500).get();
 
-  const targets = entries.docs
-    .filter((d) => !codes || codes.includes(d.get('code')))
-    .filter((d) => (d.get('text') || '').length > 10)
+  // Group text by standard code.
+  const byStandard = {};
+  for (const d of entries.docs) {
+    const e = d.data();
+    if (e.kind === 'guidance') continue;
+    const sc = e.standardCode || e.code;
+    (byStandard[sc] ||= { code: sc, parts: [] });
+    if (e.text) byStandard[sc].parts.push(e.text);
+  }
+
+  // Which standards still need a shortRef? Read the citation tree.
+  const stdSnap = await db.collection(`standardsEditions/${edition}/standards`).get();
+  const needsLabel = stdSnap.docs
+    .filter((d) => !d.get('shortRef') && !d.get('shortRefDraft'))
+    .map((d) => d.get('code'))
+    .filter((c) => !codes || codes.includes(c));
+
+  const targets = needsLabel
+    .map((sc) => ({ code: sc, text: (byStandard[sc]?.parts.join(' ') || '').slice(0, 500) }))
+    .filter((t) => t.text.length > 10)
     .slice(0, 40);
 
-  if (targets.length === 0) return { drafted: 0, note: 'No standards with text needing shortRefs.' };
+  if (targets.length === 0) return { drafted: 0, note: 'No standards with text needing labels.' };
 
-  const items = targets.map((d) => ({ code: d.get('code'), text: (d.get('text') || '').slice(0, 400) }));
+  const items = targets;
   const sys = 'You write concise neutral topic labels (max 8 words) summarizing what a ' +
     'medical accreditation standard covers. Return ONLY JSON: {"labels":[{"code","label"}]}. ' +
     'Labels are your own words, not quotes from the input.';
@@ -47,7 +66,7 @@ export const llmDraftShortRefs = onCall(withSecrets, async (req) => {
 
   const { text } = await chat(
     [{ role: 'system', content: sys }, { role: 'user', content: user }],
-    { maxTokens: 1200, json: true, temperature: 0.2 }
+    { maxTokens: 1500, json: true, temperature: 0.2 }
   );
   const parsed = extractJson(text);
 

@@ -20,6 +20,38 @@ export default function Standards() {
   const [editEntry, setEditEntry] = useState(false);
   const [attesting, setAttesting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [labeling, setLabeling] = useState(false);
+  const [labelMsg, setLabelMsg] = useState('');
+  const [draftCount, setDraftCount] = useState(0);
+
+  // Draft AI labels for standards lacking a shortRef. Runs in batches (40/call);
+  // loops until none remain or a cap, staging shortRefDraft for review.
+  async function draftLabels() {
+    setLabeling(true); setErr(''); setLabelMsg('');
+    try {
+      let total = 0;
+      for (let i = 0; i < 15; i++) {           // cap iterations (v44 ~ a few hundred)
+        const r = await mkCallable('llmDraftShortRefs')({});
+        total += r.drafted || 0;
+        if (!r.drafted) break;
+      }
+      setDraftCount(total);
+      setLabelMsg(total > 0
+        ? `Drafted ${total} labels. Review them in the list (shown in amber), then publish.`
+        : 'No standards needed labels — all are already labeled or lack text.');
+    } catch (e) { setErr(e.message); }
+    setLabeling(false);
+  }
+
+  async function confirmLabels() {
+    setLabeling(true); setErr('');
+    try {
+      const r = await mkCallable('llmConfirmShortRefs')({ edition });
+      setLabelMsg(`Published ${r.confirmed} labels.`);
+      setDraftCount(0);
+    } catch (e) { setErr(e.message); }
+    setLabeling(false);
+  }
   const [err, setErr] = useState('');
 
   // Load license attestation for this org.
@@ -78,8 +110,16 @@ export default function Standards() {
       <div className="page-head">
         <div><h1>Standards</h1><p>Edition {edition} · your handbook, obligations, and evidence per standard.</p></div>
         {isAdmin && <button className="btn ghost" onClick={() => setUploading(true)}>Upload handbook PDF</button>}
+        {isAdmin && <button className="btn" onClick={draftLabels} disabled={labeling}>
+          {labeling ? 'Labeling…' : 'Draft labels with AI'}</button>}
       </div>
       {err && <div className="err">{err}</div>}
+      {labelMsg && <div className="card card-pad" style={{ marginBottom: 12, background: 'var(--ok-bg)', borderColor: 'var(--ok)' }}>
+        <span style={{ color: 'var(--ok)' }}>{labelMsg}</span>
+        {draftCount > 0 && <button className="btn sm" style={{ marginLeft: 12 }} onClick={confirmLabels} disabled={labeling}>
+          Publish {draftCount} label{draftCount === 1 ? '' : 's'}</button>}
+        <button className="btn ghost sm" style={{ marginLeft: 8 }} onClick={() => setLabelMsg('')}>Dismiss</button>
+      </div>}
       <AskBox mkCallable={mkCallable} />
 
       <div className="crosswalk">
@@ -90,7 +130,9 @@ export default function Standards() {
                 <button key={s.id} className={`std-item ${selected?.id === s.id ? 'active' : ''}`}
                   onClick={() => select(s)}>
                   <span className="std-code tnum">{s.code}</span>
-                  <span className="std-ref">{s.shortRef}</span>
+                  <span className="std-ref">{s.shortRef || (s.shortRefDraft
+                    ? <span style={{ color: 'var(--warn)' }} title="AI draft — publish to confirm">{s.shortRefDraft} ·draft</span>
+                    : '')}</span>
                 </button>
               ))}
             </div>
