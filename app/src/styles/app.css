@@ -274,3 +274,23 @@ textarea { resize: vertical; font-family: var(--font); }
 .fr-extra { display: flex; gap: 6px; margin-top: 6px; }
 .fr-extra input { flex: 1; }
 .day-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ---- standards autocomplete ---- */
+.ac-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 20;
+  background: #fff; border: 1px solid var(--line); border-radius: 8px; margin-top: 4px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; max-height: 260px; overflow-y: auto; }
+.ac-item { display: flex; gap: 10px; align-items: center; width: 100%; text-align: left;
+  background: none; border: none; padding: 9px 12px; cursor: pointer; border-bottom: 1px solid var(--line); }
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover { background: #fafbfa; }
+.ac-ref { font-size: 13px; color: var(--slate); }
+
+/* ---- QI studies ---- */
+.qi-measure { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.qi-measure strong { color: var(--ink); font-size: 15px; }
+.pdsa-stepper { display: flex; gap: 4px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.stage { padding: 6px 14px; border: 1px solid var(--line); background: #fff; border-radius: 20px;
+  font-size: 12px; font-weight: 600; color: var(--slate); cursor: pointer; text-transform: capitalize; }
+.stage:hover { border-color: var(--accent); }
+.stage.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+@media (max-width: 720px) { .qi-measure { grid-template-columns: repeat(2, 1fr); } }

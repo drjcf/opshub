@@ -54,6 +54,10 @@ export {
 export { logsHubRoster, logsHubHistory } from './src/logs-hub.js';
 export { logTemplateCreate, logTemplateUpdate, logTemplateRetire } from './src/log-templates.js';
 export {
+  qiCreateStudy, qiAddDataPoint, qiSetBaseline, qiAddAction,
+  qiUpdateAction, qiAddAnalysis, qiAdvanceStatus, qiCloseStudy,
+} from './src/qi.js';
+export {
   onPersonnelCreated,
   onPersonnelUpdated,
   trainingSweep,

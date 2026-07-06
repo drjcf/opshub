@@ -13,6 +13,7 @@ import HandbookDrafts from './routes/HandbookDrafts.jsx';
 import Assessments from './routes/Assessments.jsx';
 import Library from './routes/Library.jsx';
 import LogsHub from './routes/LogsHub.jsx';
+import QIStudies from './routes/QIStudies.jsx';
 
 function Login() {
   const { login } = useAuth();
@@ -54,6 +55,7 @@ function Sidebar() {
       <NavLink to="/checkpoints" className="navlink">Checkpoints</NavLink>
       <NavLink to="/registers" className="navlink">Registers</NavLink>
       <NavLink to="/logs" className="navlink">Logs & Checklists</NavLink>
+      <NavLink to="/qi" className="navlink">QA / QI</NavLink>
       <NavLink to="/labels" className="navlink">Print labels</NavLink>
       <NavLink to="/people" className="navlink">People</NavLink>
       <NavLink to="/standards" className="navlink">Standards</NavLink>
@@ -95,6 +97,7 @@ export default function App() {
           <Route path="/assessments" element={<Assessments />} />
           <Route path="/library" element={<Library />} />
           <Route path="/logs" element={<LogsHub />} />
+          <Route path="/qi" element={<QIStudies />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
       </main>

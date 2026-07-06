@@ -174,9 +174,12 @@ service cloud.firestore {
 
       // -- QI studies
       match /qiStudies/{studyId} {
-        allow read: if canRead(orgId);
-        allow create, update: if isAdmin(orgId) || hasRole(orgId, 'clinicalDirector');
-        allow delete: if false;
+        allow read: if canRead(orgId);        // surveyors see QI — it's the point
+        allow write: if false;                // qi callables only
+        match /{sub=**} {
+          allow read: if canRead(orgId);
+          allow write: if false;
+        }
       }
 
       // -- committees & meetings
