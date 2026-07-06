@@ -4,6 +4,7 @@ import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { dbc } from '../lib/firebase.js';
 import { useAuth, useCallableFactory } from '../lib/auth.jsx';
 import { Modal, Loader, Empty, StatusPill } from '../components/ui.jsx';
+import EmployeeFile from './EmployeeFile.jsx';
 
 const ROLE_LABELS = {
   owner: 'Owner', admin: 'Admin', clinicalDirector: 'Clinical Director', staff: 'Staff',
@@ -16,6 +17,7 @@ export default function Members() {
   const [members, setMembers] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [viewing, setViewing] = useState(null);
   const [err, setErr] = useState('');
   const [banner, setBanner] = useState(null);
   const isOwner = myRoles.includes('owner');
@@ -34,6 +36,8 @@ export default function Members() {
     try { await mkCallable('memberDeactivate')({ uid }); }
     catch (e) { setErr(e.message); }
   }
+
+  if (viewing) return <EmployeeFile uid={viewing} onBack={() => setViewing(null)} />;
 
   return (
     <>
@@ -62,7 +66,7 @@ export default function Members() {
               {members.map((m) => (
                 <tr key={m.id}>
                   <td style={{ fontWeight: 600, color: 'var(--ink)' }}>
-                    {m.displayName}{m.id === user.uid && <span className="muted"> · you</span>}
+                    <button className="linklike" onClick={() => setViewing(m.id)}>{m.displayName}</button>{m.id === user.uid && <span className="muted"> · you</span>}
                     {m.title && <div className="muted" style={{ fontWeight: 400 }}>{m.title}</div>}
                   </td>
                   <td className="muted">{m.email}</td>

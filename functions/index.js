@@ -44,6 +44,14 @@ export {
   librarySearch,
 } from './src/library.js';
 export {
+  credentialUpsertItem,
+  credentialVerify,
+  credentialSweep,
+  hrDocRegister,
+  hrDocArchive,
+  employeeFileGet,
+} from './src/personnel-file.js';
+export {
   onPersonnelCreated,
   onPersonnelUpdated,
   trainingSweep,

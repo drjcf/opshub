@@ -9,7 +9,25 @@ service firebase.storage {
         && request.resource.size < 100 * 1024 * 1024
         && request.resource.contentType == 'application/pdf';
     }
-    // Everything else in the org tree: 25MB cap.
+
+    // Delta 10: private HR documents under a person's file. Read/write limited
+    // to HR roles OR the subject (the {uid} segment). Not org-wide.
+    match /orgs/{orgId}/personnel/{uid}/hr/{allPaths=**} {
+      function isHRtoken() {
+        return request.auth != null
+          && request.auth.token.orgId == orgId
+          && (('roles' in request.auth.token) && (
+               'owner' in request.auth.token.roles ||
+               'admin' in request.auth.token.roles ||
+               'hr' in request.auth.token.roles ||
+               'clinicalDirector' in request.auth.token.roles));
+      }
+      allow read, write: if isHRtoken() || (request.auth != null && request.auth.uid == uid
+                                            && request.auth.token.orgId == orgId
+                                            && request.resource.size < 25 * 1024 * 1024);
+    }
+
+    // Everything else in the org tree: 25MB cap, org-member.
     match /orgs/{orgId}/{allPaths=**} {
       allow read: if request.auth != null && request.auth.token.orgId == orgId;
       allow write: if request.auth != null

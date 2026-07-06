@@ -26,6 +26,15 @@ service cloud.firestore {
       return hasRole(orgId, 'owner') || hasRole(orgId, 'admin');
     }
 
+    function isHR(orgId) {
+      return inOrg(orgId) && (
+        'owner' in request.auth.token.roles ||
+        'admin' in request.auth.token.roles ||
+        'hr' in request.auth.token.roles ||
+        'clinicalDirector' in request.auth.token.roles
+      );
+    }
+
     function isStaff(orgId) {
       return inOrg(orgId) && (
         'owner' in request.auth.token.roles ||
@@ -148,6 +157,15 @@ service cloud.firestore {
           allow read: if isAdmin(orgId) || hasRole(orgId, 'clinicalDirector')
             || get(/databases/$(database)/documents/orgs/$(orgId)/personnel/$(staffId)).data.uid == request.auth.uid;
           allow write: if false;              // callables + triggers only
+        }
+        // Delta 10: HR documents — private. isHR OR the subject (own,
+        // non-confidential). Never general staff, never surveyors.
+        match /hrDocuments/{docId} {
+          allow read: if isHR(orgId)
+            || (inOrg(orgId)
+                && get(/databases/$(database)/documents/orgs/$(orgId)/personnel/$(staffId)).data.uid == request.auth.uid
+                && resource.data.confidential != true);
+          allow write: if false;              // hrDoc callables only
         }
         match /{sub=**} {
           allow read: if isStaff(orgId);
