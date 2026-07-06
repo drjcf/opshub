@@ -15,6 +15,8 @@ export default function Today() {
   const { orgId, roles, user } = useAuth();
   const [tasks, setTasks] = useState(null);
   const [checkpoints, setCheckpoints] = useState({});
+  const [credAlerts, setCredAlerts] = useState([]);
+  const isAdmin = roles.includes('owner') || roles.includes('admin') || roles.includes('clinicalDirector');
 
   useEffect(() => {
     if (!orgId) return;
@@ -26,8 +28,16 @@ export default function Today() {
     );
     const unsub2 = onSnapshot(collection(dbc, `orgs/${orgId}/checkpoints`),
       (snap) => setCheckpoints(Object.fromEntries(snap.docs.map((d) => [d.id, d.data()]))));
-    return () => { unsub(); unsub2(); };
-  }, [orgId]);
+    // Credential-expiry alerts (admin/CD only — notifications are admin-readable).
+    let unsub3 = () => {};
+    if (roles.includes('owner') || roles.includes('admin') || roles.includes('clinicalDirector')) {
+      unsub3 = onSnapshot(
+        query(collection(dbc, `orgs/${orgId}/notifications`), where('kind', '==', 'credentialExpiry')),
+        (snap) => setCredAlerts(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+        () => setCredAlerts([]));
+    }
+    return () => { unsub(); unsub2(); unsub3(); };
+  }, [orgId]); // eslint-disable-line
 
   if (tasks === null) return <Loader label="Loading today's board…" />;
 
@@ -49,13 +59,42 @@ export default function Today() {
     return CONFIG_ORG_ID ? `${APP_HOST}/s/${token}` : `${APP_HOST}/s/${orgId}/${token}`;
   }
 
+  // credential alerts grouped by tier
+  const credByTier = { expired: [], critical: [], lead: [] };
+  for (const a of credAlerts) if (credByTier[a.tier]) credByTier[a.tier].push(a);
+  const hasCredAlerts = credAlerts.length > 0;
+
   return (
     <>
       <div className="page-head">
         <div><h1>Today</h1><p>Your compliance items. Tap a check to open its form.</p></div>
       </div>
 
-      {mine.length === 0 ? (
+      {isAdmin && hasCredAlerts && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <div className="card-pad" style={{ borderBottom: '1px solid var(--line)', display: 'flex', gap: 10, alignItems: 'center' }}>
+            <StatusPill kind="alert">Credential alerts</StatusPill>
+            <span className="muted tnum">{credAlerts.length}</span>
+          </div>
+          <table>
+            <tbody>
+              {[...credByTier.expired, ...credByTier.critical, ...credByTier.lead].map((a) => (
+                <tr key={a.id}>
+                  <td>
+                    <div style={{ fontWeight: 600, color: 'var(--ink)' }}>{a.title}</div>
+                    <div className="muted">credential · {a.tier}</div>
+                  </td>
+                  <td style={{ textAlign: 'right', width: 130 }}>
+                    <StatusPill kind={a.tier === 'expired' || a.tier === 'critical' ? 'alert' : 'warn'}>{a.tier}</StatusPill>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {mine.length === 0 && !hasCredAlerts ? (
         <div className="card"><Empty title="All clear">Nothing due for you right now.</Empty></div>
       ) : (
         <>

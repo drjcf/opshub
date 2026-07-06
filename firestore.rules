@@ -231,7 +231,7 @@ service cloud.firestore {
         allow write: if false;
       }
       match /notifications/{noteId} {
-        allow read: if isAdmin(orgId);
+        allow read: if isAdmin(orgId) || hasRole(orgId, 'clinicalDirector');
         allow write: if false;                // queued by functions only
       }
 
