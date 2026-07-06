@@ -5,6 +5,9 @@ import { dbc } from '../lib/firebase.js';
 import { useAuth, useCallableFactory } from '../lib/auth.jsx';
 import { Loader, Empty, StatusPill, Modal } from '../components/ui.jsx';
 import MeetingTemplateEditor from '../components/MeetingTemplateEditor.jsx';
+import ExportButton from '../components/ExportButton.jsx';
+import { exportToDoc } from '../lib/googleExport.js';
+import { minutesDoc } from '../lib/exportContent.js';
 
 export default function Committees() {
   const { orgId, isAdmin } = useAuth();
@@ -215,7 +218,10 @@ function MeetingView({ committeeId, meetingId, committee, onBack }) {
           <h1>Meeting minutes</h1>
           <p>{meeting.date?._seconds ? new Date(meeting.date._seconds * 1000).toLocaleString() : ''}</p>
         </div>
-        <StatusPill kind={finalized ? 'ok' : 'warn'}>{meeting.status}</StatusPill>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {finalized && <ExportButton label="Export minutes" ghost build={() => exportToDoc(`Minutes - ${committee.name}`, minutesDoc(committee, meeting))} />}
+          <StatusPill kind={finalized ? 'ok' : 'warn'}>{meeting.status}</StatusPill>
+        </div>
       </div>
       {err && <div className="err">{err}</div>}
 

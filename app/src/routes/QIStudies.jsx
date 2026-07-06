@@ -4,6 +4,9 @@ import { collection, onSnapshot, query, orderBy, doc } from 'firebase/firestore'
 import { dbc } from '../lib/firebase.js';
 import { useAuth, useCallableFactory } from '../lib/auth.jsx';
 import { Loader, Empty, StatusPill, Modal } from '../components/ui.jsx';
+import ExportButton from '../components/ExportButton.jsx';
+import { exportToDoc, exportToSheet } from '../lib/googleExport.js';
+import { qiStudyDoc, qiStudyCsv } from '../lib/exportContent.js';
 
 const STATUS_KIND = { planning: 'idle', collecting: 'warn', analyzing: 'warn', acting: 'warn', remeasuring: 'warn', closed: 'ok' };
 const STAGES = ['planning', 'collecting', 'analyzing', 'acting', 'remeasuring'];
@@ -105,7 +108,11 @@ function StudyView({ studyId, onBack }) {
           <button className="btn ghost sm" onClick={onBack} style={{ marginBottom: 6 }}>← All studies</button>
           <h1>{study.title}</h1><p>{study.aim}</p>
         </div>
-        <StatusPill kind={STATUS_KIND[study.status]}>{study.status}</StatusPill>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <ExportButton label="Export report" ghost build={() => exportToDoc(`QI Study - ${study.title}`, qiStudyDoc(study, points, actions, analyses))} />
+          <ExportButton label="Export data" ghost build={() => exportToSheet(`QI Data - ${study.title}`, qiStudyCsv(study, points))} />
+          <StatusPill kind={STATUS_KIND[study.status]}>{study.status}</StatusPill>
+        </div>
       </div>
       {err && <div className="err">{err}</div>}
 

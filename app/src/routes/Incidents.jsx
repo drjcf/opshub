@@ -4,6 +4,9 @@ import { collection, onSnapshot, query, orderBy, doc } from 'firebase/firestore'
 import { dbc } from '../lib/firebase.js';
 import { useAuth, useCallableFactory } from '../lib/auth.jsx';
 import { Loader, Empty, StatusPill, Modal } from '../components/ui.jsx';
+import ExportButton from '../components/ExportButton.jsx';
+import { exportToDoc } from '../lib/googleExport.js';
+import { incidentDoc } from '../lib/exportContent.js';
 
 const TYPES = ['adverse-event', 'near-miss', 'medication-error', 'equipment-failure', 'complaint', 'fall', 'infection', 'security', 'other'];
 const SEVERITIES = ['no-harm', 'minor', 'moderate', 'severe', 'sentinel'];
@@ -106,6 +109,9 @@ function IncidentView({ incidentId, onBack }) {
         <div style={{ textAlign: 'right' }}>
           <StatusPill kind={SEV_KIND[inc.severity]}>{inc.severity}</StatusPill>{' '}
           <StatusPill kind={STATUS_KIND[inc.status]}>{inc.status}</StatusPill>
+          <div style={{ marginTop: 8 }}>
+            <ExportButton label="Export report" ghost build={() => exportToDoc(`Incident ${inc.refNumber}`, incidentDoc(inc, actions))} />
+          </div>
         </div>
       </div>
       {err && <div className="err">{err}</div>}
