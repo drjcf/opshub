@@ -54,6 +54,8 @@ export const logsHubRoster = onCall(async (req) => {
     cadence: o.cadence || '',
     catalogId: o.catalogId || null,
     templateId: o.checklistTemplateId || null,
+    checkpointId: o.checkpointId || null,
+    requireScan: !!o.requireScan,
     standardRefs: (o.standardRefs || []).map((r) => r.code || r.standardId).filter(Boolean),
     lastCompletedMs: lastByObligation[o.id]?.ms || null,
     lastCompletedBy: lastByObligation[o.id]?.by || null,

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAuth, useCallableFactory } from '../lib/auth.jsx';
 import { Loader, Empty, StatusPill, Modal } from '../components/ui.jsx';
 import LogBuilder from '../components/LogBuilder.jsx';
+import LogEditor from '../components/LogEditor.jsx';
 
 // Human-readable cadence from RRULE.
 function cadenceLabel(rrule) {
@@ -32,6 +33,7 @@ export default function LogsHub() {
   const [rows, setRows] = useState(null);
   const [history, setHistory] = useState(null);
   const [building, setBuilding] = useState(false);
+  const [editing, setEditing] = useState(null);
   const [err, setErr] = useState('');
 
   async function load() {
@@ -77,8 +79,10 @@ export default function LogsHub() {
                       {r.lastCompletedBy && <div className="muted" style={{ fontSize: 12 }}>{r.lastCompletedBy}</div>}</td>
                     <td>{r.openCount > 0 ? <StatusPill kind="warn">{r.openCount} due</StatusPill> : <span className="muted">—</span>}</td>
                     <td>{r.standardRefs.slice(0, 3).map((c) => <span key={c} className="pill st-idle" style={{ marginRight: 4 }}>{c}</span>)}</td>
-                    <td style={{ textAlign: 'right' }}>
-                      <button className="btn ghost sm" onClick={() => openHistory(r)}>History</button></td>
+                    <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      {r.checkpointId && <span className="pill st-ok" style={{ marginRight: 6 }} title="scan-gated">QR</span>}
+                      {isAdmin && <button className="btn ghost sm" onClick={() => setEditing(r)}>Edit</button>}
+                      <button className="btn ghost sm" style={{ marginLeft: 6 }} onClick={() => openHistory(r)}>History</button></td>
                   </tr>
                 );
               })}
@@ -87,7 +91,11 @@ export default function LogsHub() {
         </div>
       )}
 
-      {building && <LogBuilder mkCallable={mkCallable} editions={['aaahc-2026']}
+      {editing && <LogEditor row={editing} mkCallable={mkCallable} orgId={orgId}
+        onClose={() => setEditing(null)} onErr={setErr}
+        onDone={() => { setEditing(null); load(); }} />}
+
+      {building && <LogBuilder mkCallable={mkCallable} editions={['aaahc-2026']} orgId={orgId}
         onClose={() => setBuilding(false)} onErr={setErr}
         onDone={() => { setBuilding(false); load(); }} />}
 
