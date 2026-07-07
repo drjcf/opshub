@@ -1,0 +1,6 @@
+{
+  "name": "opshub-log-import",
+  "type": "module",
+  "private": true,
+  "dependencies": { "firebase-admin": "^13.0.0", "xlsx": "^0.18.5" }
+}
