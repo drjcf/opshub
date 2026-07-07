@@ -17,6 +17,7 @@ import QIStudies from './routes/QIStudies.jsx';
 import Committees from './routes/Committees.jsx';
 import Incidents from './routes/Incidents.jsx';
 import InfectionControl from './routes/InfectionControl.jsx';
+import Policies from './routes/Policies.jsx';
 
 function Login() {
   const { login } = useAuth();
@@ -68,6 +69,7 @@ function Sidebar() {
       <NavLink to="/handbook-drafts" className="navlink">Review entries</NavLink>
       <NavLink to="/assessments" className="navlink">Self-Assessment</NavLink>
       <NavLink to="/library" className="navlink">Library</NavLink>
+      <NavLink to="/policies" className="navlink">Policies</NavLink>
       <div className="nav-sep" />
       <NavLink to="/today" className="navlink">Today</NavLink>
       <div className="navlink" style={{ opacity: 0.5, cursor: 'default' }}>Training · soon</div>
@@ -107,6 +109,7 @@ export default function App() {
           <Route path="/committees" element={<Committees />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/infection-control" element={<InfectionControl />} />
+          <Route path="/policies" element={<Policies />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
       </main>

@@ -355,7 +355,13 @@ export const documentApproveVersion = onCall(async (req) => {
       approval: { approvedBy: who, gbMinutesEvidenceId: gbMinutesEvidenceId ?? null },
       effectiveAt: FieldValue.serverTimestamp(),
     });
-    tx.update(docRef, { currentVersionId: versionId });
+    // Approval starts the review clock (Delta 14): nextReviewDue = now + interval.
+    const months = d.get('reviewIntervalMonths') || 12;
+    tx.update(docRef, {
+      currentVersionId: versionId,
+      lastReviewedAt: FieldValue.serverTimestamp(),
+      nextReviewDue: Timestamp.fromMillis(Date.now() + months * 30 * 24 * 3600 * 1000),
+    });
     audit(tx, orgId, 'document.approveVersion', verRef.path, { previousVersion: prev }, { versionId }, who);
     return { ok: true };
   });

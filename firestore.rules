@@ -118,19 +118,16 @@ service cloud.firestore {
       // -- document control
       match /documents/{docId} {
         allow read: if canRead(orgId);
-        allow create, update: if isAdmin(orgId)
-          && untouched(['currentVersionId']);   // pointer moves via callable
-        allow delete: if false;
+        allow write: if false;                // policy callables only (Delta 14)
 
         match /versions/{versionId} {
           allow read: if canRead(orgId);
-          allow create: if isAdmin(orgId)
-            && request.resource.data.status == 'draft';
-          allow update: if isAdmin(orgId)
-            && resource.data.status == 'draft'
-            && request.resource.data.status == 'draft';  // approval via callable
-          allow delete: if false;
+          allow write: if false;
         }
+      }
+      match /documentRequirements/{reqId} {
+        allow read: if canRead(orgId);
+        allow write: if false;                // requirement callables only
       }
 
       // -- credentialing: admin/clinicalDirector write; staff read; surveyor read

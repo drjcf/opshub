@@ -302,3 +302,10 @@ textarea { resize: vertical; font-family: var(--font); }
 .ic-chip.bad { background: var(--alert-bg, #fef2f2); color: var(--alert, #dc2626); }
 .ic-dot { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; background: rgba(255,255,255,0.6); }
 @media (max-width: 720px) { .ic-status { flex-direction: column; } }
+
+/* ---- tabs ---- */
+.tab-bar { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+.tab { padding: 8px 18px; border: none; background: none; font-weight: 600; color: var(--slate);
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }

@@ -66,6 +66,10 @@ export {
   incidentAdvanceStatus, incidentClose, incidentFeedToQI,
 } from './src/incidents.js';
 export {
+  policyCreate, policySaveVersion, policyList, policyMarkReviewed, policyRetire,
+  requirementSeed, requirementCoverage, policyReviewSweep,
+} from './src/policies.js';
+export {
   onPersonnelCreated,
   onPersonnelUpdated,
   trainingSweep,
