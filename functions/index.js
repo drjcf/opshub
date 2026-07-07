@@ -67,8 +67,12 @@ export {
 } from './src/incidents.js';
 export {
   policyCreate, policySaveVersion, policyList, policyMarkReviewed, policyRetire,
-  requirementSeed, requirementCoverage, policyReviewSweep,
+  requirementSeed, requirementCoverage, requirementAutoLink, requirementSetSatisfied, policyReviewSweep,
 } from './src/policies.js';
+export {
+  manualSectionCreate, manualSectionUpdate, manualSectionReorder, manualSectionDelete,
+  policyPlaceInSection, policyReorderInSection, manualGet,
+} from './src/manual.js';
 export {
   onPersonnelCreated,
   onPersonnelUpdated,

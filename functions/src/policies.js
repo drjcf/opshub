@@ -168,36 +168,142 @@ export const requirementCoverage = onCall(async (req) => {
   requireOrg(auth, orgId);
   requireRole(auth, ['owner', 'admin', 'clinicalDirector', 'staff']);
 
-  const [reqs, docs] = await Promise.all([
+  const [reqs, docs, obs] = await Promise.all([
     db.collection(`orgs/${orgId}/documentRequirements`).get(),
     db.collection(`orgs/${orgId}/documents`).where('status', '==', 'active').get(),
+    db.collection(`orgs/${orgId}/obligations`).where('status', '==', 'active').get(),
   ]);
   const docById = {};
   for (const d of docs.docs) docById[d.id] = { id: d.id, ...d.data() };
+  const obById = {};
+  for (const o of obs.docs) obById[o.id] = { id: o.id, ...o.data() };
+
+  // Most-recent finalized evidence per obligation (for log/register coverage).
+  const evSnap = await db.collection(`orgs/${orgId}/evidence`)
+    .where('status', '==', 'finalized').get();
+  const lastEvidenceByOb = {};
+  for (const e of evSnap.docs) {
+    const oid = e.get('obligationId'); if (!oid) continue;
+    const ms = e.get('finalizedAt')?.toMillis?.() || 0;
+    if (!lastEvidenceByOb[oid] || ms > lastEvidenceByOb[oid]) lastEvidenceByOb[oid] = ms;
+  }
 
   const rows = await Promise.all(reqs.docs.map(async (r) => {
     const req0 = r.data();
-    const doc = req0.docId ? docById[req0.docId] : null;
-    let status = 'unmet', versionStatus = null;
-    if (doc && doc.currentVersionId) {
-      const v = await db.doc(`orgs/${orgId}/documents/${doc.id}/versions/${doc.currentVersionId}`).get();
-      versionStatus = v.exists ? v.get('status') : null;
-      const nextDue = doc.nextReviewDue ? doc.nextReviewDue._seconds * 1000 : null;
-      status = (nextDue && nextDue < Date.now()) ? 'review-due' : 'met';
-    } else if (doc) {
-      status = 'unmet'; // doc exists but no approved current version
+    const backing = req0.backing || (req0.docId ? { type: 'policy', ref: req0.docId } : null);
+    let status = 'unmet', versionStatus = null, backingTitle = null, backingType = backing?.type || 'manual';
+
+    if (backing?.type === 'policy' || (!backing && req0.docId)) {
+      const doc = docById[backing?.ref || req0.docId];
+      backingTitle = doc?.title || null;
+      if (doc && doc.currentVersionId) {
+        const v = await db.doc(`orgs/${orgId}/documents/${doc.id}/versions/${doc.currentVersionId}`).get();
+        versionStatus = v.exists ? v.get('status') : null;
+        const nextDue = doc.nextReviewDue ? doc.nextReviewDue._seconds * 1000 : null;
+        status = (nextDue && nextDue < Date.now()) ? 'review-due' : (versionStatus === 'approved' ? 'met' : 'unmet');
+      } else if (doc) {
+        status = 'draft-only';
+      }
+    } else if (backing?.type === 'obligation' || backing?.type === 'register') {
+      const ob = obById[backing.ref];
+      backingTitle = ob?.title || null;
+      if (ob) {
+        // covered if a completion exists in the last ~13 months (cadence-agnostic)
+        const last = lastEvidenceByOb[backing.ref];
+        const fresh = last && (Date.now() - last) < 400 * 24 * 3600 * 1000;
+        status = fresh ? 'met' : 'active-no-recent-evidence';
+      }
+    } else {
+      // manual/standing record — presence tracked by an explicit flag
+      status = req0.satisfied === true ? 'met' : 'unmet';
+      backingType = 'manual';
     }
+
     return {
       key: r.id, title: req0.title, category: req0.category, required: req0.required !== false,
+      kind: req0.kind || backingType,
       standardRefs: (req0.standardRefs || []).map((x) => x.code).filter(Boolean),
-      docId: doc?.id || null, docTitle: doc?.title || null, versionStatus, status,
+      backingType, backingTitle, versionStatus, status,
     };
   }));
 
   const met = rows.filter((x) => x.status === 'met').length;
   const total = rows.filter((x) => x.required).length;
-  rows.sort((a, b) => (a.status === b.status ? a.title.localeCompare(b.title) : a.status.localeCompare(b.status)));
+  const order = { unmet: 0, 'draft-only': 1, 'active-no-recent-evidence': 2, 'review-due': 3, met: 4 };
+  rows.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || a.title.localeCompare(b.title));
   return { rows, met, total };
+});
+
+// ---------------- requirementAutoLink ----------------
+// Matches each requirement to a backing artifact (policy document, obligation,
+// or register) by normalized-title similarity, and writes the backing pointer.
+// Idempotent; only fills backings that resolve confidently.
+export const requirementAutoLink = onCall(async (req) => {
+  const auth = requireAuth(req);
+  const { orgId } = req.data || {};
+  requireOrg(auth, orgId);
+  requireRole(auth, ['owner', 'admin']);
+  const who = actor(auth);
+
+  const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const [reqs, docs, obs] = await Promise.all([
+    db.collection(`orgs/${orgId}/documentRequirements`).get(),
+    db.collection(`orgs/${orgId}/documents`).where('status', '==', 'active').get(),
+    db.collection(`orgs/${orgId}/obligations`).where('status', '==', 'active').get(),
+  ]);
+  const docList = docs.docs.map((d) => ({ id: d.id, n: norm(d.get('title')) }));
+  const obList = obs.docs.map((o) => ({ id: o.id, n: norm(o.get('title')), type: o.get('evidenceType') === 'register' ? 'register' : 'obligation' }));
+
+  const score = (a, b) => {
+    if (!a || !b) return 0;
+    if (a === b) return 1;
+    const aw = a.split(' '), bw = b.split(' ');
+    const overlap = aw.filter((w) => w.length > 3 && bw.includes(w)).length;
+    return overlap / Math.max(aw.length, bw.length);
+  };
+  const best = (target, list) => {
+    let top = null, s = 0;
+    for (const c of list) { const cs = score(target, c.n); if (cs > s) { s = cs; top = c; } }
+    return s >= 0.5 ? top : null;
+  };
+
+  const batch = db.batch();
+  let linked = 0;
+  for (const r of reqs.docs) {
+    const data = r.data();
+    if (data.backing?.ref) continue; // already linked
+    const hint = data.backingHint || 'policy';
+    const tn = norm(data.title);
+    let match = null, type = null;
+    if (hint === 'policy') { const m = best(tn, docList); if (m) { match = m.id; type = 'policy'; } }
+    if (!match && (hint === 'obligation' || hint === 'register' || hint === 'log')) {
+      const m = best(tn, obList); if (m) { match = m.id; type = m.type; }
+    }
+    if (!match) { // fall back: try the other pool
+      const m = best(tn, hint === 'policy' ? obList : docList);
+      if (m) { match = m.id; type = m.type || 'policy'; }
+    }
+    if (match) {
+      batch.set(r.ref, { backing: { type, ref: match } }, { merge: true });
+      linked++;
+    }
+  }
+  await batch.commit();
+  await auditDirect(orgId, 'requirement.autoLink', `orgs/${orgId}/documentRequirements`, null, { linked }, who);
+  return { linked, total: reqs.size };
+});
+
+// ---------------- requirementSetSatisfied ----------------
+// Manually mark a standing-record requirement satisfied (or not).
+export const requirementSetSatisfied = onCall(async (req) => {
+  const auth = requireAuth(req);
+  const { orgId, key, satisfied } = req.data || {};
+  requireOrg(auth, orgId);
+  requireRole(auth, ['owner', 'admin', 'clinicalDirector']);
+  const who = actor(auth);
+  await db.doc(`orgs/${orgId}/documentRequirements/${key}`).set({ satisfied: !!satisfied }, { merge: true });
+  await auditDirect(orgId, 'requirement.setSatisfied', `orgs/${orgId}/documentRequirements/${key}`, null, { satisfied: !!satisfied }, who);
+  return { ok: true };
 });
 
 // ---------------- policyReviewSweep (scheduled) ----------------

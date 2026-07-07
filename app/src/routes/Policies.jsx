@@ -10,7 +10,7 @@ import { Loader, Empty, StatusPill, Modal } from '../components/ui.jsx';
 const DOC_TYPES = ['policy', 'procedure', 'plan', 'form', 'manual'];
 const CATEGORIES = ['infection-control', 'governance', 'clinical', 'safety', 'hr', 'emergency', 'quality', 'medication', 'facility', 'other'];
 const REVIEW_KIND = { current: 'ok', 'review-due': 'alert', 'draft-only': 'warn' };
-const COVERAGE_KIND = { met: 'ok', 'review-due': 'warn', unmet: 'alert' };
+const COVERAGE_KIND = { met: 'ok', 'review-due': 'warn', unmet: 'alert', 'draft-only': 'warn', 'active-no-recent-evidence': 'warn' };
 
 export default function Policies() {
   const { orgId, isAdmin } = useAuth();
@@ -296,37 +296,62 @@ function Coverage({ orgId }) {
   const mkCallable = useCallableFactory();
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
-  useEffect(() => {
-    if (!orgId) return;
+  const [busy, setBusy] = useState(false);
+  const [filter, setFilter] = useState('all');
+
+  function load() {
     mkCallable('requirementCoverage')({}).then(setData).catch((e) => { setErr(e.message); setData({ rows: [] }); });
-  }, [orgId]); // eslint-disable-line
+  }
+  useEffect(() => { if (orgId) load(); }, [orgId]); // eslint-disable-line
+
+  async function autoLink() {
+    setBusy(true); setErr('');
+    try { const r = await mkCallable('requirementAutoLink')({}); await load(); alert(`Linked ${r.linked} of ${r.total} requirements to policies/logs/registers.`); }
+    catch (e) { setErr(e.message); }
+    setBusy(false);
+  }
+  async function toggleSatisfied(key, satisfied) {
+    try { await mkCallable('requirementSetSatisfied')({ key, satisfied }); load(); } catch (e) { setErr(e.message); }
+  }
 
   if (!data) return err ? <div className="err">{err}</div> : <Loader label="Computing coverage…" />;
   if (data.rows.length === 0) return <div className="card"><Empty title="No requirements seeded">
-    Seed the required-document registry to see coverage against AAAHC's expected set.</Empty></div>;
+    Seed the compliance checklist to see live survey-readiness coverage.</Empty></div>;
 
   const pct = data.total ? Math.round((data.met / data.total) * 100) : 0;
+  const kinds = ['all', 'policy', 'log', 'register', 'record'];
+  const rows = filter === 'all' ? data.rows : data.rows.filter((r) => (r.kind || r.backingType) === filter);
+  const KIND_LABEL = { policy: 'Policy', log: 'Log', register: 'Register', record: 'Record', obligation: 'Log' };
+
   return (
     <>
+      {err && <div className="err">{err}</div>}
       <div className="card card-pad" style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 28, fontWeight: 700, color: pct >= 80 ? 'var(--ok)' : pct >= 50 ? 'var(--warn)' : 'var(--alert, #dc2626)' }}>{pct}%</div>
-          <div><strong>{data.met} of {data.total}</strong> required documents met
-            <div className="muted" style={{ fontSize: 13 }}>met = approved current version, not past review</div></div>
+          <div style={{ flex: 1 }}><strong>{data.met} of {data.total}</strong> requirements met
+            <div className="muted" style={{ fontSize: 13 }}>met = approved policy in-cycle, log with recent evidence, register present, or record confirmed</div></div>
+          <button className="btn" onClick={autoLink} disabled={busy}>{busy ? 'Linking…' : 'Auto-link to artifacts'}</button>
         </div>
+      </div>
+      <div className="tab-bar" style={{ marginBottom: 12 }}>
+        {kinds.map((k) => <button key={k} className={`tab ${filter === k ? 'active' : ''}`} onClick={() => setFilter(k)}>{k === 'all' ? 'All' : KIND_LABEL[k] + 's'}</button>)}
       </div>
       <div className="card">
         <table>
-          <thead><tr><th>Required document</th><th>Category</th><th>Standards</th><th>Status</th></tr></thead>
+          <thead><tr><th>Requirement</th><th>Type</th><th>Backing</th><th>Standards</th><th>Status</th></tr></thead>
           <tbody>
-            {data.rows.map((r) => (
+            {rows.map((r) => (
               <tr key={r.key}>
-                <td style={{ fontWeight: 600, color: 'var(--ink)' }}>{r.title}
-                  {!r.required && <span className="muted" style={{ fontWeight: 400 }}> · recommended</span>}
-                  {r.docTitle && <div className="muted" style={{ fontWeight: 400 }}>→ {r.docTitle}</div>}</td>
-                <td className="muted">{r.category}</td>
+                <td style={{ fontWeight: 600, color: 'var(--ink)' }}>{r.title}</td>
+                <td><span className="pill st-idle">{KIND_LABEL[r.kind || r.backingType] || r.kind}</span></td>
+                <td className="muted">{r.backingTitle
+                  ? <>→ {r.backingTitle}</>
+                  : (r.kind === 'record' || r.backingType === 'manual')
+                    ? <label style={{ cursor: 'pointer' }}><input type="checkbox" checked={r.status === 'met'} onChange={(e) => toggleSatisfied(r.key, e.target.checked)} /> confirmed on file</label>
+                    : <span style={{ color: 'var(--alert, #dc2626)' }}>not linked</span>}</td>
                 <td>{r.standardRefs.slice(0, 2).map((c) => <span key={c} className="pill st-idle" style={{ marginRight: 4 }}>{c}</span>)}</td>
-                <td><StatusPill kind={COVERAGE_KIND[r.status]}>{r.status}</StatusPill></td>
+                <td><StatusPill kind={COVERAGE_KIND[r.status] || 'idle'}>{r.status}</StatusPill></td>
               </tr>
             ))}
           </tbody>
